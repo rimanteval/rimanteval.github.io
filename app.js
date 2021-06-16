@@ -7,9 +7,9 @@ checkSession();
 function checkSession(){
    var c = getCookie("visited");
    if (c === "yes") {
-    sm.getApi({
+        sm.getApi({
         version: 'v1'
-      }).then(function(glia) {
+        }).then(function(glia) {
         glia.updateInformation({
           customAttributesUpdateMethod: 'merge',
           customAttributes: {
@@ -27,6 +27,15 @@ function checkSession(){
       });
    } else {
        console.log("has not visited before");
+       sm.getApi({
+        version: 'v1'
+        }).then(function(glia) {
+        glia.updateInformation({
+          customAttributes: {
+            first_time: "true"
+          }
+        });
+      });
    }
    setCookie("visited", "yes", 365); // expire in 1 year; or use null to never expire
 }
