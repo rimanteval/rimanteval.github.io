@@ -7,8 +7,26 @@ checkSession();
 function checkSession(){
    var c = getCookie("visited");
    if (c === "yes") {
-     continue;
+       console.log("yes");
+    sm.getApi({
+        version: 'v1'
+      }).then(function(glia) {
+        glia.updateInformation({
+          customAttributes: {
+            first_time: "false"
+          },
+        }).then(function() {
+          console.log("1");
+        }).catch(function(error) {
+          if (error.cause == glia.ERRORS.NETWORK_TIMEOUT) {
+            console.log("2");
+          } else {
+            console.log("3");
+          }
+        });
+      });
    } else {
+       console.log("no");
     sm.getApi({
         version: 'v1'
       }).then(function(glia) {
