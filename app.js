@@ -4,6 +4,18 @@ function getCookie(c_name){var c_value = document.cookie;var c_start = c_value.i
 
 window.setTimeout(checkSession(),5000);
 
+function goToQueue(q1){
+   sm.getApi({
+      version: 'v1'
+   }).then(function(glia) {
+      glia.queueForEngagement('text', {queueId: q1})
+         .catch(function(error) { 
+         console.log(error);
+      });
+   });
+}
+   
+   
 function checkSession(){
    var c = getCookie("visited");
    if (c === "yes") {
