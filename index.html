@@ -1,77 +1,441 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>Doge Photos</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="assets/css/main.css">
-		<script async src="https://api.glia.com/salemove_integration.js"></script>
-		 <!--<script async src="https://api.glia.com/salemove_integration.js?site_id=9a827ee1-d2d2-4dcb-b16a-c1cd1d8a5b6a"></script>*/-->
-	</head>
-	<body>
-		<!-- Wrapper -->
-			<div id="wrapper">
-				<!-- Header -->
-					<header id="header">
-						<span class="avatar"><a href="/regex.html"><img src="images/avatar.jpg" alt=""></a></span>
-						<h1>This is <strong>Mopsu</strong> and <strong>Ruudi</strong>, two cuddle bugs who enjoy short walks in the snow and long naps on the couch.</h1>
-						<div class="btn2"><button>click me for engagement</button></div>
-						<ul class="icons">
-							<li><a href="https://www.instagram.com/mopsuruudi/" class="icon style2 fa-instagram"><span class="label">Instagram</span></a></li>
-						</ul>
-						<div class="icons"><a href="/something.html"><h2>click me for something</h2></a></div>
-						<div class="button1"><button>click me for something</button></div>
-						<div class="button1"><button onclick="goToQueue('e050e1e5-77a5-4999-87b5-5ad1445298ea')">click me to route to a queue</button></div>
-					</header>
-				<!-- Main -->
-						<!-- Thumbnails -->
-							<section class="thumbnails">
-															<div>
-									<a href="images/fulls/01.jpg">
-										<img src="images/fulls/01.jpg" alt="" />
-										<h3>What... are you doing?..</h3>
-									</a>
-									<a href="images/fulls/02.jpg">
-										<img src="images/fulls/02.jpg" alt="" />
-										<h3>Sharing is caring</h3>
-									</a>
-								</div>
-								<div>
-									<a href="images/fulls/03.jpg">
-										<img src="images/fulls/03.jpg" alt="" />
-										<h3>I'm a big boi i promise</h3>
-									</a>
-									<a href="images/fulls/04.jpg">
-										<img src="images/fulls/04.jpg" alt="" />
-										<h3>Mid-play nap</h3>
-									</a>
-								</div>
-								<div>
-									<a href="images/fulls/06.jpg">
-										<img src="images/fulls/06.jpg" alt="" />
-										<h3>How you doin?</h3>
-									</a>
-									<a href="images/fulls/05.jpg">
-										<img src="images/fulls/05.jpg" alt="" />
-										<h3>U got food???</h3>
-									</a>
-								</div>
-							</section>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mopsu &amp; Ruudi | Cozy Adventures</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+    <script async src="https://api.glia.com/salemove_integration.js"></script>
+    <style>
+        :root {
+            --bg: #0e1117;
+            --panel: #141925;
+            --accent: #f7c548;
+            --accent-2: #78c0e0;
+            --text: #e9edf5;
+            --muted: #9aa5c0;
+            --shadow: 0 10px 50px rgba(0, 0, 0, 0.35);
+        }
 
-				<!-- Footer -->
-					<footer id="footer">
-						<p></p>
-					</footer>
+        * { box-sizing: border-box; }
 
-			</div>
+        body {
+            margin: 0;
+            font-family: 'Manrope', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at 10% 20%, rgba(120, 192, 224, 0.14), transparent 28%),
+                        radial-gradient(circle at 90% 10%, rgba(247, 197, 72, 0.2), transparent 30%),
+                        linear-gradient(145deg, #0b0e14, #121826 55%, #0e121b);
+            min-height: 100vh;
+        }
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.poptrox.min.js"></script>
-			<script src="assets/js/skel.min.js"></script>
-			<script src="assets/js/main.js"></script>
-			<script src="app.js"></script>
+        a { color: inherit; text-decoration: none; }
 
-	</body>
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px 48px;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(120, 192, 224, 0.16), rgba(247, 197, 72, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(120% 140% at 90% 15%, rgba(120, 192, 224, 0.25), transparent 55%);
+            pointer-events: none;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            font-size: 1.1rem;
+        }
+
+        .brand span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 14px;
+            margin: 0;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: var(--muted);
+            font-weight: 600;
+            padding: 10px 14px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        nav a:hover,
+        nav a:focus-visible {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 26px;
+            align-items: center;
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: clamp(2rem, 3vw, 2.6rem);
+            line-height: 1.1;
+        }
+
+        .hero p {
+            margin: 0 0 18px;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            border: 1px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn.primary {
+            background: linear-gradient(120deg, var(--accent), #f7963f);
+            color: #0b0e14;
+            box-shadow: 0 10px 30px rgba(247, 197, 72, 0.25);
+            border: none;
+        }
+
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .btn:hover,
+        .btn:focus-visible {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .hero figure {
+            margin: 0;
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .hero img {
+            width: 100%;
+            display: block;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pill-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin: 22px 0 10px;
+        }
+
+        .pill {
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        section {
+            margin: 40px 0;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            margin: 0 0 12px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--panel);
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: var(--shadow);
+            min-height: 100%;
+        }
+
+        .card h3 {
+            margin: 0 0 8px;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+            color: var(--accent);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: var(--shadow);
+        }
+
+        .cta {
+            background: linear-gradient(120deg, rgba(120, 192, 224, 0.18), rgba(247, 197, 72, 0.15));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 22px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .cta p { margin: 0; color: var(--muted); }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        footer ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding: 0;
+            margin: 10px 0 0;
+        }
+
+        footer a {
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        @media (max-width: 540px) {
+            .hero-actions { flex-direction: column; align-items: flex-start; }
+            .btn { width: 100%; justify-content: center; }
+            nav ul { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div class="nav">
+                <div class="brand">
+                    <span><img src="images/avatar.jpg" alt="Mopsu and Ruudi" width="44" height="44"></span>
+                    Mopsu &amp; Ruudi Adventures
+                </div>
+                <nav aria-label="Primary">
+                    <ul>
+                        <li><a href="#story">Story</a></li>
+                        <li><a href="#gallery">Gallery</a></li>
+                        <li><a href="#contact">Connect</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="hero">
+                <div>
+                    <p class="pill">Snow-loving cuddle bugs | Based wherever the couch is coziest</p>
+                    <h1>Two pups, endless mischief, and a lot of warm blankets.</h1>
+                    <p>Mopsu is the strategic snack planner. Ruudi is the fearless nap champion. Together they explore snowy backyards, share the comfiest pillows, and greet every new friend with tail wags.</p>
+                    <div class="hero-actions">
+                        <a class="btn primary" href="#gallery">See the latest adventures</a>
+                        <button class="btn secondary" type="button" onclick="goToQueue('e050e1e5-77a5-4999-87b5-5ad1445298ea')">Start a chat</button>
+                    </div>
+                    <div class="pill-row">
+                        <div class="pill">⏰ Optimal walk time: sunrise crunch in fresh snow</div>
+                        <div class="pill">🧣 Style: matching scarves, unmatched personalities</div>
+                        <div class="pill">🍪 Motivation: snacks, ear scratches, repeat</div>
+                    </div>
+                </div>
+                <figure>
+                    <img src="images/fulls/02.jpg" alt="Mopsu and Ruudi sharing a chair together">
+                </figure>
+            </div>
+        </header>
+
+        <section id="story">
+            <h2 class="section-title">Meet the duo</h2>
+            <div class="card-grid">
+                <article class="card">
+                    <h3>Mopsu — the strategist</h3>
+                    <p>Keeps an eye on the treat jar, knows every squeaky toy by name, and has perfected the art of leaning into your shins until you offer a snack.</p>
+                </article>
+                <article class="card">
+                    <h3>Ruudi — the adventurer</h3>
+                    <p>Bravely trots through snowdrifts, naps with heroic intensity, and guards the couch like it's a royal throne. Friendly to everyone, especially biscuit donors.</p>
+                </article>
+                <article class="card">
+                    <h3>Their vibe</h3>
+                    <p>Short walks, long naps, lots of soft blankets. Expect joyful zoomies, polite head tilts, and enough fluff to power a small pillow factory.</p>
+                </article>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Fast facts</h2>
+            <div class="stats">
+                <div class="stat"><strong>3</strong>Favorite nap spots in rotation</div>
+                <div class="stat"><strong>12</strong>Snacks negotiated per day (on average)</div>
+                <div class="stat"><strong>5</strong>Minutes to suit up for snow, seconds to dive in</div>
+                <div class="stat"><strong>∞</strong>Tail wags available for friendly visitors</div>
+            </div>
+        </section>
+
+        <section>
+            <div class="cta">
+                <div>
+                    <h2 class="section-title">Need a quick hello?</h2>
+                    <p>Queue up a chat to say hi, share pup tips, or request a new photo from today's mini adventure.</p>
+                </div>
+                <div class="hero-actions">
+                    <button class="btn primary" type="button" onclick="goToQueue('e050e1e5-77a5-4999-87b5-5ad1445298ea')">Message the handlers</button>
+                    <a class="btn secondary" href="https://www.instagram.com/mopsuruudi/" target="_blank" rel="noreferrer">Follow on Instagram</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery">
+            <h2 class="section-title">Photo highlights</h2>
+            <div class="gallery">
+                <img src="images/fulls/01.jpg" alt="Mopsu looking curious at the camera">
+                <img src="images/fulls/02.jpg" alt="Sharing a chair while relaxing">
+                <img src="images/fulls/03.jpg" alt="Ruudi posing with a serious expression">
+                <img src="images/fulls/04.jpg" alt="Mid-play nap during toy time">
+                <img src="images/fulls/05.jpg" alt="Eager face asking for food">
+                <img src="images/fulls/06.jpg" alt="Friendly hello with bright eyes">
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2 class="section-title">Stay cozy with us</h2>
+            <div class="card-grid">
+                <article class="card">
+                    <h3>Winter adventures</h3>
+                    <p>We chase the first snowfall, collect nose prints on the window, and retreat inside for hot cocoa breaks (humans only, sadly).</p>
+                </article>
+                <article class="card">
+                    <h3>Cozy downtime</h3>
+                    <p>Weighted blankets, soft playlists, and synchronized snoring. Mopsu and Ruudi believe rest is the best training plan.</p>
+                </article>
+                <article class="card">
+                    <h3>Friends welcome</h3>
+                    <p>Drop a message, share a photo of your own pets, or ask for our best paw-care tips. Tail wags guaranteed.</p>
+                </article>
+            </div>
+        </section>
+
+        <footer>
+            <p>Thanks for hanging out with Mopsu &amp; Ruudi. Bring treats next time!</p>
+            <ul>
+                <li><a href="https://www.instagram.com/mopsuruudi/" target="_blank" rel="noreferrer">Instagram</a></li>
+                <li><a href="/something.html">Mystery corner</a></li>
+                <li><button class="btn secondary" type="button" onclick="goToQueue('e050e1e5-77a5-4999-87b5-5ad1445298ea')">Start a chat</button></li>
+            </ul>
+        </footer>
+    </div>
+
+    <script src="app.js" defer></script>
+</body>
 </html>
-
