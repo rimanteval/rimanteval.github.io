@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Business Rule Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .syntax-display { font-family: 'Menlo', 'Monaco', 'Courier New', monospace; }
+        .step-number { font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
+        .transition-height { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+    <div class="max-w-6xl mx-auto p-6">
+        
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">Web Business Rule Logic Builder</h1>
+            <p class="text-slate-600">Generate conflict-free Glia syntax using Broad (Blocklist) or Narrow (Allowlist) strategies.</p>
+        </header>
+
+        <div class="grid gap-6 lg:grid-cols-12">
+            
+            <!-- LEFT COLUMN: The Inputs (Span 7 cols) -->
+            <div class="lg:col-span-7 space-y-5">
+                
+                <!-- BOX 1: DOMAINS (Coming From) -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-indigo-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <span class="bg-indigo-100 text-indigo-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                            Target Domains (Coming From)
+                        </h3>
+                        <span class="text-xs text-indigo-600 font-semibold bg-indigo-50 px-2 py-0.5 rounded">Filter Site</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3">Limit the rule to specific domains or paths. Leave empty for "Anywhere".</p>
+                    <textarea id="inputDomains" 
+                        oninput="generateSyntax()"
+                        class="w-full h-20 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none text-sm font-mono leading-relaxed"
+                        placeholder="packers.com&#10;app.packers.com"></textarea>
+                </div>
+
+                <!-- BOX 2: STRATEGY SELECTOR -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-4">
+                        <span class="bg-slate-200 text-slate-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                        Select Logic Strategy
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-2">
+                        <!-- Strategy A: Broad -->
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="strategy" value="broad" checked onchange="toggleStrategy()" class="peer sr-only">
+                            <div class="p-4 rounded-lg border-2 border-slate-200 hover:border-red-200 peer-checked:border-red-500 peer-checked:bg-red-50 transition-all text-center h-full">
+                                <div class="text-red-600 font-bold mb-1"><i class="fas fa-ban mr-1"></i> Broad (Blocklist)</div>
+                                <p class="text-xs text-slate-500">Matches <strong>EVERYTHING</strong> by default, unless you block specific paths or strings.</p>
+                            </div>
+                        </label>
+
+                        <!-- Strategy B: Narrow -->
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="strategy" value="narrow" onchange="toggleStrategy()" class="peer sr-only">
+                            <div class="p-4 rounded-lg border-2 border-slate-200 hover:border-green-200 peer-checked:border-green-500 peer-checked:bg-green-50 transition-all text-center h-full">
+                                <div class="text-green-600 font-bold mb-1"><i class="fas fa-filter mr-1"></i> Narrow (Allowlist)</div>
+                                <p class="text-xs text-slate-500">Matches <strong>NOTHING</strong> by default, unless you include specific paths or strings.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- DYNAMIC INPUT AREA -->
+                
+                <!-- INPUT A: Broad (Excludes) -->
+                <div id="broadContainer" class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-red-500 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <span class="bg-red-100 text-red-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                            Blocked Keywords (Exclude)
+                        </h3>
+                        <span class="text-xs text-red-600 font-semibold bg-red-50 px-2 py-0.5 rounded">Filter Path</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3">Fire on all pages <strong>EXCEPT</strong> those containing these paths or strings.</p>
+                    <textarea id="inputBlocked" 
+                        oninput="generateSyntax()"
+                        class="w-full h-24 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none resize-none text-sm font-mono leading-relaxed"
+                        placeholder="admin&#10;login&#10;checkout"></textarea>
+                </div>
+
+                <!-- INPUT B: Narrow (Includes) -->
+                <div id="narrowContainer" class="hidden bg-white p-5 rounded-xl shadow-sm border-l-4 border-green-500 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <span class="bg-green-100 text-green-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                            Required Keywords (Include)
+                        </h3>
+                        <span class="text-xs text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded">Filter Path</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3"><strong>ONLY</strong> fire on pages containing these words.</p>
+                    <textarea id="inputRequired" 
+                        oninput="generateSyntax()"
+                        class="w-full h-24 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none resize-none text-sm font-mono leading-relaxed"
+                        placeholder="schedule&#10;tickets&#10;shop"></textarea>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: The Output (Span 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col">
+                <div class="bg-slate-800 rounded-xl shadow-xl overflow-hidden flex flex-col h-full sticky top-6">
+                    
+                    <!-- Output Header -->
+                    <div class="bg-slate-900 p-4 border-b border-slate-700">
+                        <h2 class="text-white font-bold flex items-center gap-2">
+                            <i class="fas fa-code text-indigo-400"></i> Generated Syntax
+                        </h2>
+                    </div>
+
+                    <div class="p-6 space-y-8 flex-1">
+                        
+                        <!-- Field: Coming From -->
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Coming From</label>
+                                <button onclick="copyToClipboard('outputComingFrom')" class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+                                    <i class="far fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <input readonly id="outputComingFrom" 
+                                class="syntax-display w-full bg-slate-900/50 border border-slate-600 rounded p-4 text-indigo-200 focus:outline-none focus:border-indigo-500 transition-all text-sm" 
+                                value="*">
+                            <p class="text-xs text-slate-500 mt-2">Paste this into <strong>Conditions > Coming From</strong>.</p>
+                        </div>
+
+                        <!-- Field: Navigation -->
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="text-xs uppercase tracking-wider text-yellow-400 font-semibold">Source > Navigation</label>
+                                <button onclick="copyToClipboard('outputNavigation')" class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+                                    <i class="far fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <textarea readonly id="outputNavigation" 
+                                class="syntax-display w-full h-32 bg-slate-900/50 border border-slate-600 rounded p-4 text-yellow-200 focus:outline-none focus:border-indigo-500 resize-none leading-relaxed text-sm shadow-inner"></textarea>
+                            <p class="text-xs text-slate-500 mt-2">Paste this into <strong>Source > Navigation</strong>.</p>
+                        </div>
+
+                        <!-- English Explanation -->
+                        <div class="bg-slate-700/50 rounded-lg p-4 border border-slate-600 mt-auto">
+                            <h4 class="text-xs font-bold text-indigo-300 uppercase mb-2">Logic Summary:</h4>
+                            <p id="ruleExplanation" class="text-sm text-slate-300 leading-relaxed italic">
+                                Matches everything.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentStrategy = 'broad';
+
+        function toggleStrategy() {
+            const radios = document.getElementsByName('strategy');
+            for (const radio of radios) {
+                if (radio.checked) {
+                    currentStrategy = radio.value;
+                    break;
+                }
+            }
+
+            const broadContainer = document.getElementById('broadContainer');
+            const narrowContainer = document.getElementById('narrowContainer');
+
+            if (currentStrategy === 'broad') {
+                broadContainer.classList.remove('hidden');
+                narrowContainer.classList.add('hidden');
+            } else {
+                broadContainer.classList.add('hidden');
+                narrowContainer.classList.remove('hidden');
+            }
+
+            generateSyntax();
+        }
+
+        function getLines(elementId) {
+            const raw = document.getElementById(elementId).value;
+            return raw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+        }
+
+        function generateSyntax() {
+            // 1. Get Inputs
+            const domains = getLines('inputDomains');
+            const required = getLines('inputRequired'); // Used in Narrow
+            const blocked = getLines('inputBlocked');   // Used in Broad
+
+            // --- GENERATE COMING FROM (Targets) ---
+            let comingFromSyntax = "*";
+            if (domains.length === 1) {
+                comingFromSyntax = `*${domains[0]}*`;
+            } else if (domains.length > 1) {
+                comingFromSyntax = `*(${domains.join('|')})*`;
+            }
+            document.getElementById('outputComingFrom').value = comingFromSyntax;
+
+            // --- GENERATE NAVIGATION ---
+            let navSyntax = "";
+            let explain = "";
+            let domainExplain = (domains.length > 0) ? `User is on <strong>[ ${domains.join(' OR ')} ]</strong>` : "User is on <strong>ANY DOMAIN</strong>";
+
+            if (currentStrategy === 'broad') {
+                // BROAD: Default is * (Everything). Exclude specific blocks.
+                if (blocked.length === 0) {
+                    navSyntax = "*";
+                    explain = `${domainExplain}<br>2. Rule fires on <strong>ALL PAGES</strong> (No blocks set).`;
+                } else {
+                    // Logic: (!*exclude*)* or (!*(exc1|exc2)*)*
+                    if (blocked.length === 1) {
+                        navSyntax = `(!*${blocked[0]}*)*`;
+                    } else {
+                        navSyntax = `(!*(${blocked.join('|')})*)*`;
+                    }
+                    explain = `${domainExplain}<br>2. Rule fires on <strong>ALL PAGES</strong>...<br>3. <strong>EXCEPT</strong> if URL contains <strong>[ ${blocked.join(' OR ')} ]</strong>`;
+                }
+            } else {
+                // NARROW: Default is Nothing. Only fire on Includes.
+                if (required.length === 0) {
+                    navSyntax = ""; // Or strict match nothing? Usually implies incomplete config.
+                    explain = `${domainExplain}<br>2. Rule fires on <strong>NOTHING</strong> (No keywords added).`;
+                } else {
+                    // Logic: *include* or *(inc1|inc2)*
+                    if (required.length === 1) {
+                        navSyntax = `*${required[0]}*`;
+                    } else {
+                        navSyntax = `*(${required.join('|')})*`;
+                    }
+                    explain = `${domainExplain}<br>2. Rule <strong>ONLY</strong> fires if URL contains <strong>[ ${required.join(' OR ')} ]</strong>`;
+                }
+            }
+            
+            document.getElementById('outputNavigation').value = navSyntax;
+            document.getElementById('ruleExplanation').innerHTML = explain;
+        }
+
+        function copyToClipboard(id) {
+            const el = document.getElementById(id);
+            el.select();
+            document.execCommand('copy');
+            
+            const btn = document.querySelector(`button[onclick="copyToClipboard('${id}')"]`);
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+            }, 1500);
+        }
+
+        // Init on load
+        generateSyntax();
+    </script>
+</body>
+</html>
