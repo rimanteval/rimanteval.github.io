@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PII Masking Regex Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        .code-preview {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        }
+        /* Custom scrollbar for the legend */
+        .legend-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .legend-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        .legend-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+    <div class="max-w-4xl mx-auto p-6">
+        
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">Regex Generator for PII Masking</h1>
+            <p class="text-slate-600">Enter words below to generate an RE2-compliant regex pattern that catches common variations (leetspeak).</p>
+        </header>
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden mb-6">
+            
+            <!-- Input Section -->
+            <div class="p-6 border-b border-slate-100">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-sm font-semibold text-slate-700">
+                        Target Words
+                    </label>
+                    <button onclick="toggleLegend()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+                        <i class="fas fa-info-circle"></i> View Active Substitutions
+                    </button>
+                </div>
+
+                <!-- Legend Panel (Hidden by default) -->
+                <div id="legendPanel" class="hidden mb-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100 text-sm">
+                    <h3 class="font-semibold text-indigo-900 mb-2">Character Substitution Map</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 legend-scroll max-h-40 overflow-y-auto" id="legendGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <p class="text-xs text-slate-500 mb-3">
+                    Enter the "clean" version of the words you want to block (separated by commas or new lines).
+                </p>
+                <textarea 
+                    id="inputWords" 
+                    class="w-full h-32 p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none bg-slate-50 transition-all"
+                    placeholder="Example: heck, darn, shoot"></textarea>
+                
+                <div class="mt-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="strictMode" class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                        <label for="strictMode" class="text-sm text-slate-600">Strict Mode (Exact matches only, no variations)</label>
+                    </div>
+                    <button 
+                        onclick="generateRegex()" 
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                        <i class="fas fa-magic"></i> Generate Pattern
+                    </button>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="p-6 bg-slate-50">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                    Generated RE2 Pattern
+                </label>
+                <div class="relative group">
+                    <pre id="outputRegex" class="code-preview w-full p-4 bg-slate-800 text-green-400 rounded-lg overflow-x-auto whitespace-pre-wrap min-h-[60px] flex items-center">No input yet...</pre>
+                    <button 
+                        onclick="copyToClipboard()" 
+                        class="absolute top-2 right-2 bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500 mt-2">
+                    Copy this pattern into <strong>Admin Console > Privacy & Security > PII Masking</strong>.
+                </p>
+            </div>
+        </div>
+
+        <!-- Testing Sandbox -->
+        <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+            <div class="p-4 bg-slate-100 border-b border-slate-200">
+                <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-flask text-indigo-500"></i> Test Sandbox
+                </h2>
+            </div>
+            <div class="p-6 grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Test Input</label>
+                    <textarea 
+                        id="testInput" 
+                        oninput="runTest()"
+                        class="w-full h-32 p-3 border border-slate-300 rounded-lg focus:border-indigo-500 outline-none"
+                        placeholder="Type a sentence here using variations (e.g., 'What the h3ck') to test if the rule catches it."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Preview Result</label>
+                    <div 
+                        id="testOutput" 
+                        class="w-full h-32 p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 overflow-y-auto whitespace-pre-wrap">
+                        <span class="text-slate-400 italic">Results will appear here...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Character map for common leetspeak substitutions
+        // Updated to explicitly include @ for a, $ for s, and common variations
+        const charMap = {
+            'a': '[aA@4]',
+            'b': '[bB8]',
+            'c': '[cC(<{]',
+            'd': '[dD]',
+            'e': '[eE3]',
+            'f': '[fF]',
+            'g': '[gG6]',
+            'h': '[hH]',
+            'i': '[iI1!|]',
+            'j': '[jJ]',
+            'k': '[kK]',
+            'l': '[lL1|]',
+            'm': '[mM]',
+            'n': '[nN]',
+            'o': '[oO0]',
+            'p': '[pP]',
+            'q': '[qQ9]',
+            'r': '[rR]',
+            's': '[sS$5zZ]', // Added z/Z as they are common substitutions for s
+            't': '[tT7+]',
+            'u': '[uUvV]',
+            'v': '[vV]',
+            'w': '[wW]',
+            'x': '[xX]',
+            'y': '[yY]',
+            'z': '[zZ2]'
+        };
+
+        let currentRegexPattern = null;
+
+        // Populate Legend
+        function initLegend() {
+            const grid = document.getElementById('legendGrid');
+            for (const [char, regex] of Object.entries(charMap)) {
+                // Remove brackets for cleaner display
+                const cleanChars = regex.replace('[', '').replace(']', '').split('').join(' ');
+                const div = document.createElement('div');
+                div.className = "text-xs text-indigo-800 bg-white px-2 py-1 rounded border border-indigo-100";
+                div.innerHTML = `<strong class="uppercase mr-1">${char}:</strong> <span class="font-mono text-slate-500">${cleanChars}</span>`;
+                grid.appendChild(div);
+            }
+        }
+        
+        function toggleLegend() {
+            const panel = document.getElementById('legendPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function generateRegex() {
+            const input = document.getElementById('inputWords').value;
+            const strictMode = document.getElementById('strictMode').checked;
+            
+            // Split by comma or newline, trim whitespace, remove empty strings
+            const words = input.split(/[\n,]+/).map(w => w.trim()).filter(w => w.length > 0);
+
+            if (words.length === 0) {
+                document.getElementById('outputRegex').textContent = "Please enter at least one word.";
+                document.getElementById('outputRegex').classList.add('text-slate-500');
+                document.getElementById('outputRegex').classList.remove('text-green-400');
+                currentRegexPattern = null;
+                return;
+            }
+
+            const patterns = words.map(word => {
+                if (strictMode) {
+                    return escapeRegExp(word);
+                }
+
+                // Transform each character into its regex group equivalent
+                let regexWord = '';
+                for (let char of word) {
+                    const lowerChar = char.toLowerCase();
+                    if (charMap[lowerChar]) {
+                        regexWord += charMap[lowerChar];
+                    } else {
+                        // If it's a number or symbol not in map, just escape it
+                        regexWord += escapeRegExp(char);
+                    }
+                }
+                return regexWord;
+            });
+
+            // Construct the final RE2 pattern
+            // (?i) = case insensitive
+            // \b = word boundary
+            // (p1|p2|p3) = group of OR options
+            const finalRegex = `(?i)\\b(${patterns.join('|')})\\b`;
+
+            const outputEl = document.getElementById('outputRegex');
+            outputEl.textContent = finalRegex;
+            outputEl.classList.remove('text-slate-500');
+            outputEl.classList.add('text-green-400');
+
+            // Save for testing
+            // Note: JS Regex is slightly different than RE2, but close enough for this preview
+            try {
+                currentRegexPattern = new RegExp(`\\b(${patterns.join('|')})\\b`, 'gi');
+            } catch (e) {
+                console.error("Regex error:", e);
+                currentRegexPattern = null;
+            }
+
+            // Run test immediately if there is input
+            runTest();
+        }
+
+        function runTest() {
+            const input = document.getElementById('testInput').value;
+            const outputDiv = document.getElementById('testOutput');
+
+            if (!input) {
+                outputDiv.innerHTML = '<span class="text-slate-400 italic">Results will appear here...</span>';
+                return;
+            }
+
+            if (!currentRegexPattern) {
+                outputDiv.textContent = input; // Pass through if no regex generated yet
+                return;
+            }
+
+            // Replace matches with asterisks
+            const masked = input.replace(currentRegexPattern, (match) => {
+                return '*'.repeat(match.length);
+            });
+
+            outputDiv.textContent = masked;
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('outputRegex').textContent;
+            if (!text || text === "No input yet...") return;
+
+            const tempInput = document.createElement("textarea");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            // Visual feedback
+            const btn = document.querySelector('button[onclick="copyToClipboard()"]');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+            }, 2000);
+        }
+
+        // Initialize the legend on load
+        initLegend();
+    </script>
+</body>
+</html>
